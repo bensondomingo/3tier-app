@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  client:
+    build: ./client/
+    container_name: 3tier_client
+    depends_on:
+      - backend
+    networks:
+      - 3tier_network
+    ports:
+      - "3000:3000"
+
+  backend:
+    build: ./backend/
+    container_name: 3tier_backend
+    depends_on:
+      - mongo
+    networks:
+      - 3tier_network
+    ports:
+      - "4000:4000"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    networks:
+      - 3tier_network
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - 3tier_volume:/data/db
+    networks:
+      - 3tier_network
+
+volumes:
+  3tier_volume:
+    name: "3tier_volume"
+
+networks:
+  3tier_network:
+    name: 3tier_network
+    driver: bridge
